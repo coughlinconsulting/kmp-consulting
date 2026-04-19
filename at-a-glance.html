@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>At a Glance</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+   body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: transparent;
+  padding: 1rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: .75rem;
+    }
+
+    .urgency-row {
+      display: grid;
+grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .status-row {
+      display: grid;
+grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));      gap: 10px;
+    }
+
+    .urgency-box {
+      border-radius: 12px;
+      padding: 1rem 1.25rem 1.25rem;
+      border-left: 4px solid transparent;
+      min-height: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: .4rem;
+    }
+
+    .urgency-lbl { font-size: 12px; font-weight: 600; }
+    .urgency-num { font-size: 36px; font-weight: 500; line-height: 1; }
+
+    .status-pill {
+      border-radius: 8px;
+      padding: .6rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 4px;
+      border: 0.5px solid transparent;
+    }
+
+    .pill-lbl { font-size: 11px; font-weight: 600; }
+    .pill-num { font-size: 16px; font-weight: 500; line-height: 1; }
+
+    /* — Active states — */
+    .red   { background: #FCEBEB; border-left-color: #E24B4A; }
+    .red   .urgency-num { color: #791F1F; }
+    .red   .urgency-lbl { color: #A32D2D; }
+
+    .yellow { background: #FAEEDA; border-left-color: #EF9F27; }
+    .yellow .urgency-num { color: #633806; }
+    .yellow .urgency-lbl { color: #854F0B; }
+
+    .blue  { background: #E6F1FB; border-left-color: #378ADD; }
+    .blue  .urgency-num { color: #0C447C; }
+    .blue  .urgency-lbl { color: #185FA5; }
+
+    .orange { background: #FAEEDA; border-color: #EF9F27; }
+    .orange .pill-num { color: #633806; }
+    .orange .pill-lbl { color: #854F0B; }
+
+    .purple { background: #EEEDFE; border-color: #AFA9EC; }
+    .purple .pill-num { color: #3C3489; }
+    .purple .pill-lbl { color: #534AB7; }
+
+    .pill-red { background: #FCEBEB; border-color: #F09595; }
+    .pill-red .pill-num { color: #791F1F; }
+    .pill-red .pill-lbl { color: #A32D2D; }
+
+    /* — Zero state — always green + faded — */
+    .zero {
+      background: #EAF3DE;
+      border-left-color: #97C459;
+      border-color: #C0DD97;
+      opacity: .5;
+    }
+    .zero .urgency-num { color: #27500A; }
+    .zero .urgency-lbl { color: #3B6D11; }
+    .zero .pill-num    { color: #27500A; }
+    .zero .pill-lbl    { color: #3B6D11; }
+  </style>
+</head>
+<body>
+
+  <div class="section-label">At a glance</div>
+
+  <div class="urgency-row">
+    <div class="urgency-box" id="box-overdue">
+      <div class="urgency-lbl">Overdue</div>
+      <div class="urgency-num" id="num-overdue">3</div>
+    </div>
+    <div class="urgency-box" id="box-today">
+      <div class="urgency-lbl">Due today</div>
+      <div class="urgency-num" id="num-today">2</div>
+    </div>
+    <div class="urgency-box" id="box-week">
+      <div class="urgency-lbl">Due this week</div>
+      <div class="urgency-num" id="num-week">4</div>
+    </div>
+  </div>
+
+  <div class="status-row">
+    <div class="status-pill" id="box-blocked">
+      <div class="pill-lbl">Blocked</div>
+      <div class="pill-num" id="num-blocked">1</div>
+    </div>
+    <div class="status-pill" id="box-onhold">
+      <div class="pill-lbl">On hold</div>
+      <div class="pill-num" id="num-onhold">2</div>
+    </div>
+    <div class="status-pill" id="box-nodate">
+      <div class="pill-lbl">No due date</div>
+      <div class="pill-num" id="num-nodate">7</div>
+    </div>
+  </div>
+
+  <script>
+    const counts = {
+      overdue: 3,
+      today:   2,
+      week:    4,
+      blocked: 1,
+      onhold:  2,
+      nodate:  7
+    };
+
+    function applyColors() {
+      const u = [
+        { id: 'overdue', active: 'red'    },
+        { id: 'today',   active: 'yellow' },
+        { id: 'week',    active: 'blue'   },
+      ];
+      u.forEach(({ id, active }) => {
+        const box = document.getElementById('box-' + id);
+        box.classList.add(counts[id] === 0 ? 'zero' : active);
+      });
+
+      const s = [
+        { id: 'blocked', active: 'orange'  },
+        { id: 'onhold',  active: 'purple'  },
+        { id: 'nodate',  active: 'pill-red'},
+      ];
+      s.forEach(({ id, active }) => {
+        const box = document.getElementById('box-' + id);
+        box.classList.add(counts[id] === 0 ? 'zero' : active);
+      });
+    }
+
+    applyColors();
+  </script>
+
+</body>
+</html>
