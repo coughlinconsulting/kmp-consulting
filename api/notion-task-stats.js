@@ -30,7 +30,6 @@ export default async function handler(req, res) {
   });
 
  const data = await response.json();
-console.log('Notion response:', JSON.stringify(data));
 const tasks = data.results || [];
 
   const today = new Date().toISOString().split('T')[0];
