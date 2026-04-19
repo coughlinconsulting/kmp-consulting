@@ -111,66 +111,81 @@ grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));      gap: 10px;
   <div class="urgency-row">
     <div class="urgency-box" id="box-overdue">
       <div class="urgency-lbl">Overdue</div>
-      <div class="urgency-num" id="num-overdue">3</div>
+      <div class="urgency-num" id="num-overdue">–</div>
     </div>
     <div class="urgency-box" id="box-today">
       <div class="urgency-lbl">Due today</div>
-      <div class="urgency-num" id="num-today">2</div>
+      <div class="urgency-num" id="num-today">–</div>
     </div>
     <div class="urgency-box" id="box-week">
       <div class="urgency-lbl">Due this week</div>
-      <div class="urgency-num" id="num-week">4</div>
+      <div class="urgency-num" id="num-week">–</div>
     </div>
   </div>
 
   <div class="status-row">
     <div class="status-pill" id="box-blocked">
       <div class="pill-lbl">Blocked</div>
-      <div class="pill-num" id="num-blocked">1</div>
+      <div class="pill-num" id="num-blocked">–</div>
     </div>
     <div class="status-pill" id="box-onhold">
       <div class="pill-lbl">On hold</div>
-      <div class="pill-num" id="num-onhold">2</div>
+      <div class="pill-num" id="num-onhold">–</div>
     </div>
     <div class="status-pill" id="box-nodate">
       <div class="pill-lbl">No due date</div>
-      <div class="pill-num" id="num-nodate">7</div>
+      <div class="pill-num" id="num-nodate">–</div>
     </div>
   </div>
 
   <script>
-    const counts = {
-      overdue: 3,
-      today:   2,
-      week:    4,
-      blocked: 1,
-      onhold:  2,
-      nodate:  7
-    };
+    async function loadStats() {
+      try {
+        const response = await fetch('https://kmp-consulting.vercel.app/api/notion-task-stats');
+        const data = await response.json();
 
-    function applyColors() {
-      const u = [
-        { id: 'overdue', active: 'red'    },
-        { id: 'today',   active: 'yellow' },
-        { id: 'week',    active: 'blue'   },
-      ];
-      u.forEach(({ id, active }) => {
-        const box = document.getElementById('box-' + id);
-        box.classList.add(counts[id] === 0 ? 'zero' : active);
-      });
+        const counts = {
+          overdue: data.overdue,
+          today:   data.dueToday,
+          week:    data.dueThisWeek,
+          blocked: data.blocked,
+          onhold:  data.onHold,
+          nodate:  data.noDueDate
+        };
 
-      const s = [
-        { id: 'blocked', active: 'orange'  },
-        { id: 'onhold',  active: 'purple'  },
-        { id: 'nodate',  active: 'pill-red'},
-      ];
-      s.forEach(({ id, active }) => {
-        const box = document.getElementById('box-' + id);
-        box.classList.add(counts[id] === 0 ? 'zero' : active);
-      });
+        document.getElementById('num-overdue').textContent = counts.overdue;
+        document.getElementById('num-today').textContent   = counts.today;
+        document.getElementById('num-week').textContent    = counts.week;
+        document.getElementById('num-blocked').textContent = counts.blocked;
+        document.getElementById('num-onhold').textContent  = counts.onhold;
+        document.getElementById('num-nodate').textContent  = counts.nodate;
+
+        const u = [
+          { id: 'overdue', active: 'red'    },
+          { id: 'today',   active: 'yellow' },
+          { id: 'week',    active: 'blue'   },
+        ];
+        u.forEach(({ id, active }) => {
+          const box = document.getElementById('box-' + id);
+          box.classList.add(counts[id] === 0 ? 'zero' : active);
+        });
+
+        const s = [
+          { id: 'blocked', active: 'orange'  },
+          { id: 'onhold',  active: 'purple'  },
+          { id: 'nodate',  active: 'pill-red'},
+        ];
+        s.forEach(({ id, active }) => {
+          const box = document.getElementById('box-' + id);
+          box.classList.add(counts[id] === 0 ? 'zero' : active);
+        });
+
+      } catch (error) {
+        console.error('Failed to load stats:', error);
+      }
     }
 
-    applyColors();
+    loadStats();
   </script>
 
 </body>
