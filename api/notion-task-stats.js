@@ -4,6 +4,27 @@ export default async function handler(req, res) {
 
   const token = process.env.NOTION_TOKEN;
   const databaseId = process.env.NOTION_DATABASE_ID;
+  const userId = req.query.user;
+
+  const filter = {
+    and: [
+      {
+        property: 'Status',
+        status: { does_not_equal: 'Done' }
+      },
+      {
+        property: 'Status',
+        status: { does_not_equal: 'No Longer Needed' }
+      }
+    ]
+  };
+
+  if (userId) {
+    filter.and.push({
+      property: 'Assigned',
+      people: { contains: userId }
+    });
+  }
 
   const response = await fetch(`https://api.notion.com/v1/databases/${databaseId}/query`, {
     method: 'POST',
@@ -14,23 +35,12 @@ export default async function handler(req, res) {
     },
     body: JSON.stringify({
       page_size: 100,
-      filter: {
-        and: [
-          {
-            property: 'Status',
-            status: { does_not_equal: 'Done' }
-          },
-          {
-            property: 'Status',
-            status: { does_not_equal: 'No Longer Needed' }
-          }
-        ]
-      }
+      filter
     }),
   });
 
- const data = await response.json();
-const tasks = data.results || [];
+  const data = await response.json();
+  const tasks = data.results || [];
 
   const today = new Date().toISOString().split('T')[0];
   const weekEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
