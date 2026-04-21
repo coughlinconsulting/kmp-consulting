@@ -141,7 +141,12 @@ grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));      gap: 10px;
   <script>
     async function loadStats() {
       try {
-        const response = await fetch('https://kmp-consulting.vercel.app/api/notion-task-stats');
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('user');
+        const apiUrl = userId 
+            ? `https://kmp-consulting.vercel.app/api/notion-task-stats?user=${userId}`
+            : 'https://kmp-consulting.vercel.app/api/notion-task-stats';
+        const response = await fetch(apiUrl);
         const data = await response.json();
 
         const counts = {
